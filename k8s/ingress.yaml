@@ -3,9 +3,17 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: url-alias-service
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/redirect-entry-point: https
+    cert-manager.io/issuer: letsencrypt
 spec:
+  tls:
+  - hosts:
+    - url-alias.example.com
+    secretName: url-alias-service-tls
   rules:
-  - host: "url-alias.example.com"
+  - host: url-alias.example.com
     http:
       paths:
       - path: /
