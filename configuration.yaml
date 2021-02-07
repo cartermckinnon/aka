@@ -8,3 +8,10 @@ server:
       port: 8081
 apiCredentials:
   admin: password
+storage:
+  factoryClass: mck.service.urlalias.storage.redis.RedisUrlAliasStorageFactory
+  factory:
+    redis:
+      host: localhost
+      port: 6379
+      ssl: false

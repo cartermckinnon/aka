@@ -23,7 +23,7 @@ public class UrlAliasServiceRedirectResource {
   @GET
   @Path("/{alias}")
   public Response redirect(@PathParam("alias") @NotBlank String alias) {
-    var url = storage.getUrl(alias);
+    var url = storage.get(alias);
     if (url.isPresent()) {
       return Response.temporaryRedirect(url.get()).build();
     }

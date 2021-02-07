@@ -14,33 +14,50 @@ public abstract class UrlAliasStorageTest {
   public abstract UrlAliasStorage createImpl();
 
   @Test
-  public void setAlias() {
-    UrlAliasStorage storage = createImpl();
-    URI url = URI.create("http://mckinnon.xyz");
-    assertThat(storage.setAlias(url, "alias")).isFalse();
-    assertThat(storage.setAlias(url, "alias")).isTrue();
-  }
-
-  @Test
-  public void getAlias() {
-    UrlAliasStorage storage = createImpl();
-    URI url = URI.create("http://mckinnon.xyz");
-    assertThat(storage.getAlias(url)).isEmpty();
-    storage.setAlias(url, "alias");
-    assertThat(storage.getAlias(url)).isPresent().get().isEqualTo(("alias"));
-    storage.deleteAlias(url);
-    assertThat(storage.getAlias(url)).isEmpty();
-  }
-
-  @Test
-  public void getUrl() {
+  public void getAndSet() {
     UrlAliasStorage storage = createImpl();
     URI url = URI.create("http://mckinnon.xyz");
     String alias = "alias";
-    assertThat(storage.getUrl(alias)).isEmpty();
-    storage.setAlias(url, alias);
-    assertThat(storage.getUrl(alias)).isPresent().get().isEqualTo(url);
-    storage.deleteAlias(url);
-    assertThat(storage.getUrl(alias)).isEmpty();
+
+    // set for the first time
+    storage.set(url, alias);
+    assertThat(storage.get(url)).isPresent().get().isEqualTo(alias);
+    assertThat(storage.get(alias)).isPresent().get().isEqualTo(url);
+    assertThat(storage.getUrls()).containsExactly(url);
+    assertThat(storage.getAliases()).containsExactly(alias);
+
+    // update the alias, which should remove the old one
+    String aliasUpdated = "aliasUpdated";
+    storage.set(url, aliasUpdated);
+    assertThat(storage.get(url)).isPresent().get().isEqualTo(aliasUpdated);
+    assertThat(storage.get(aliasUpdated)).isPresent().get().isEqualTo(url);
+    assertThat(storage.get(alias)).isEmpty();
+    assertThat(storage.getUrls()).containsExactly(url);
+    assertThat(storage.getAliases()).containsExactly(aliasUpdated);
+  }
+
+  @Test
+  public void delete() {
+    UrlAliasStorage storage = createImpl();
+    URI url = URI.create("http://mckinnon.xyz");
+    String alias = "alias";
+
+    // has not been set yet
+    assertThat(storage.delete(url)).isFalse();
+    assertThat(storage.delete(alias)).isFalse();
+
+    // delete by URL
+    storage.set(url, alias);
+    assertThat(storage.delete(url)).isTrue();
+    assertThat(storage.delete(alias)).isFalse();
+    assertThat(storage.get(url)).isEmpty();
+    assertThat(storage.get(alias)).isEmpty();
+
+    // delete by alias
+    storage.set(url, alias);
+    assertThat(storage.delete(alias)).isTrue();
+    assertThat(storage.delete(url)).isFalse();
+    assertThat(storage.get(url)).isEmpty();
+    assertThat(storage.get(alias)).isEmpty();
   }
 }
