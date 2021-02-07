@@ -2,7 +2,7 @@
 
 Naive HTTP service for URL aliasing/redirecting.
 
-TinyURL-like services are generally annoying to use by requiring registration, consumption of ads, or over-complexity. This is a comparable service you can run yourself. It provides no persistent storage, a bare-bones feature set, and only basic authentication.
+TinyURL-like services are generally annoying to use by requiring registration, consumption of ads, or over-complexity. This is a comparable service you can run yourself. It provides a bare-bones feature set, basic authentication, and optional, external storage in Redis.
 
 ### :warning: **Warning** :warning:
 
