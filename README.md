@@ -22,7 +22,7 @@ scripts/build.sh
 
 ### Run
 
-Modify `configuration.yaml` as necessary, then:
+Modify [`configuration.yaml`](configuration.yaml) as necessary, then:
 
 ```sh
 scripts/run.sh
@@ -39,8 +39,17 @@ curl \
   -u admin:password \
   http://localhost:8080/api/set
 ```
+See the [management HTTP API implementation](src/main/java/mck/service/urlalias/resources/UrlAliasServiceApiResource.java) for more.
 
 Use an alias:
 ```sh
 curl -L http://localhost:8080/google
 ```
+See the ["redirect" HTTP API implementation](src/main/java/mck/service/urlalias/resources/UrlAliasServiceRedirectResource.java) for more.
+
+### Storage
+
+By default, all data is kept in-memory. This means a "highly available" deployment of the service is not possible.
+You can enable storage in Redis, if you want to be able to restart the service without losing your data, or if you want to deploy multiple instances of the service for redundancy.
+
+See [`configuration.yaml`](configuration.yaml) for an example of a Redis storage configuration block.
