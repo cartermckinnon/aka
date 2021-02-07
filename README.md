@@ -66,7 +66,9 @@ See [`configuration.yaml`](configuration.yaml) for an example of a Redis storage
 
 An example set of Kubernetes resources is provided in [k8s](k8s/). A single-node Redis service is included.
 
-Modify [configmap.yaml](k8s/configmap.yaml) to set a proper username and password. Set your host (and [add TLS](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)) in [ingress.yaml](k8s/ingress.yaml).
+Modify [configmap.yaml](k8s/configmap.yaml) to set a proper username and password.
+
+Set your host (and [add TLS](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)) in [ingress.yaml](k8s/ingress.yaml).
 
 Deploy the resources with:
 ```sh
