@@ -61,3 +61,14 @@ By default, all data is kept in-memory. This means a "highly available" deployme
 You can enable storage in Redis, if you want to be able to restart the service without losing your data, or if you want to deploy multiple instances of the service for redundancy.
 
 See [`configuration.yaml`](configuration.yaml) for an example of a Redis storage configuration block.
+
+### Kubernetes
+
+An example set of Kubernetes resources is provided in [k8s](k8s/). A single-node Redis service is included.
+
+Modify [configmap.yaml](k8s/configmap.yaml) to set a proper username and password. Set your host (and add TLS) in [ingress.yaml](k8s/ingress.yaml).
+
+Deploy the resources with:
+```sh
+kubectl create -f k8s/
+```
