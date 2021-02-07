@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: url-alias-service
+  labels:
+    app: url-alias-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: url-alias-service
+  template:
+    metadata:
+      labels:
+        app: url-alias-service
+    spec:
+      containers:
+        - name: url-alias-service
+          image: mckdev/url-alias-service
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: configuration
+              mountPath: "/app/configuration/"
+              readOnly: true
+      volumes:
+        - name: configuration
+          configMap:
+            name: url-alias-service
+            items:
+              - key: "configuration.yaml"
+                path: "configuration.yaml"
