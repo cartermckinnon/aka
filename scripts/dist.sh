@@ -3,6 +3,7 @@
 set -ex
 
 cd $(dirname $0)
+cd ..
 
 rm -rf dist/
 mkdir dist/
