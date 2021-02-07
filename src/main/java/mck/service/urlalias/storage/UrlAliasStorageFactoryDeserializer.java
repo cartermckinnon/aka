@@ -7,6 +7,24 @@ import lombok.Setter;
 import lombok.ToString;
 import mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory;
 
+/**
+ * Deserializes implementations of {@link UrlAliasStorageFactory}.
+ *
+ * <p>The factory implementation must be deserializable from YAML with Jackson, such as:
+ *
+ * <pre>
+ * ---
+ * factoryClass: com.example.MyUrlAliasStorageFactoryImpl
+ * factory:
+ *   foo: bar
+ *   baz: oof
+ * </pre>
+ *
+ * This class will convert the generic, deserialized object into an instance of type {@code
+ * factoryClass}.
+ *
+ * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
+ */
 @Getter
 @Setter
 @ToString
