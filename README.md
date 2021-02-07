@@ -76,11 +76,16 @@ See [`configuration.yaml`](configuration.yaml) for an example of a Redis storage
 
 An example set of Kubernetes resources is provided in [k8s](k8s/). A single-node Redis service is included.
 
-Modify [configmap.yaml](k8s/configmap.yaml) to set a proper username and password.
+To use the included LetsEncrypt-based automatic TLS, your cluster needs to have [cert-manager](https://cert-manager.io/docs/installation/kubernetes/) installed.
+You probably want to use the LetsEncrypt staging environment while you're getting things going, to avoid hitting any rate-limits. See the comment in [letsencrypt-issuer.yaml](k8s/letsencrypt-issuer.yaml).
 
-Set your host (and [add TLS](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls)) in [ingress.yaml](k8s/ingress.yaml).
+1. Modify [configmap.yaml](k8s/configmap.yaml) to set a proper username and password.
 
-Deploy the resources with:
-```sh
-kubectl create -f k8s/
-```
+1. Set your host in [ingress.yaml](k8s/ingress.yaml).
+**Note** that these manifests assume that your cluster's ingress controller is [Traefik](https://github.com/traefik/traefik/).
+Traefik is the ingress controller used by [k3s](https://k3s.io/), my Kubernetes distribution of choice for projects like these.
+If you're using a different ingress controller, modify the annotations in [ingress.yaml](k8s/ingress.yaml) and `ingress.class` in [letsencrypt-issuer.yaml](k8s/letsencrypt-issuer.yaml) as necessary.
+
+1. Set your email address in [letsencrypt-issuer.yaml](k8s/letsencrypt-issuer.yaml).
+
+1. Deploy the resources: `kubectl create -f k8s/`
