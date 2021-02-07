@@ -14,11 +14,15 @@ You should always run this service over TLS because of the use of HTTP basic aut
 - Maven
 - Docker
 
+---
+
 ### Build
 
 ```sh
 scripts/build.sh
 ```
+
+---
 
 ### Run
 
@@ -35,6 +39,8 @@ docker run \
   -v $PWD/configuration.yaml:/app/configuration/configuration.yaml \
   mckdev/url-alias-service
 ```
+
+---
 
 ### Usage
 
@@ -55,12 +61,16 @@ curl -L http://localhost:8080/google
 ```
 See the ["redirect" HTTP API implementation](src/main/java/mck/service/urlalias/resources/UrlAliasServiceRedirectResource.java) for more.
 
+---
+
 ### Storage
 
 By default, all data is kept in-memory. This means a "highly available" deployment of the service is not possible.
 You can enable storage in Redis, if you want to be able to restart the service without losing your data, or if you want to deploy multiple instances of the service for redundancy.
 
 See [`configuration.yaml`](configuration.yaml) for an example of a Redis storage configuration block.
+
+---
 
 ### Kubernetes
 
