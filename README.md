@@ -17,7 +17,7 @@ You should always run this service over TLS because of the use of HTTP basic aut
 ### Build
 
 ```sh
-./build.sh
+scripts/build.sh
 ```
 
 ### Run
@@ -25,7 +25,7 @@ You should always run this service over TLS because of the use of HTTP basic aut
 Modify `configuration.yaml` as necessary, then:
 
 ```sh
-./run.sh
+scripts/run.sh
 ```
 
 ### Usage
