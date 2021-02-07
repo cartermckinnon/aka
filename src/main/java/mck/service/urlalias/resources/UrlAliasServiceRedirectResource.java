@@ -27,6 +27,6 @@ public class UrlAliasServiceRedirectResource {
     if (url.isPresent()) {
       return Response.temporaryRedirect(url.get()).build();
     }
-    return Response.status(404).build();
+    return Response.status(404).type("text/plain").entity("Huh?").build();
   }
 }
