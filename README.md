@@ -28,6 +28,14 @@ Modify [`configuration.yaml`](configuration.yaml) as necessary, then:
 scripts/run.sh
 ```
 
+With Docker:
+```sh
+docker run \
+  -p 8080:8080 \
+  -v $PWD/configuration.yaml:/app/configuration/configuration.yaml \
+  mckdev/url-alias-service
+```
+
 ### Usage
 
 Create an alias:
