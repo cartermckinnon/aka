@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import mck.service.urlalias.storage.UrlAliasStorage;
+import mck.service.urlalias.storage.InstrumentedUrlAliasStorage;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
-public class RedisUrlAliasStorage implements UrlAliasStorage {
+public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
 
   private final JedisPool pool;
 
@@ -22,7 +22,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public Optional<String> get(URI url) {
+  public Optional<String> getImpl(URI url) {
     byte[] alias;
     try (Jedis jedis = pool.getResource()) {
       alias = jedis.get(RedisKeys.url(url));
@@ -31,7 +31,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public Optional<URI> get(String alias) {
+  public Optional<URI> getImpl(String alias) {
     byte[] url;
     try (Jedis jedis = pool.getResource()) {
       url = jedis.get(RedisKeys.alias(alias));
@@ -40,7 +40,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public Collection<URI> getUrls() {
+  public Collection<URI> getUrlsImpl() {
     List<URI> urls = new ArrayList<>();
     ScanParams params = new ScanParams();
     params.match(RedisKeys.URL_PATTERN);
@@ -56,7 +56,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public Collection<String> getAliases() {
+  public Collection<String> getAliasesImpl() {
     List<String> aliases = new ArrayList<>();
     ScanParams params = new ScanParams();
     params.match(RedisKeys.ALIAS_PATTERN);
@@ -72,7 +72,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public void set(URI url, String alias) {
+  public void setImpl(URI url, String alias) {
     byte[] urlKey = RedisKeys.url(url);
     byte[] aliasKey = RedisKeys.alias(alias);
     String status;
@@ -99,7 +99,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public boolean delete(URI url) {
+  public boolean deleteImpl(URI url) {
     byte[] urlKey = RedisKeys.url(url);
     try (Jedis jedis = pool.getResource()) {
       byte[] alias = jedis.get(urlKey);
@@ -113,7 +113,7 @@ public class RedisUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public boolean delete(String alias) {
+  public boolean deleteImpl(String alias) {
     byte[] aliasKey = RedisKeys.alias(alias);
     try (Jedis jedis = pool.getResource()) {
       byte[] url = jedis.get(aliasKey);

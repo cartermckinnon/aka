@@ -13,9 +13,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import lombok.extern.slf4j.Slf4j;
 import mck.service.urlalias.api.SetUrlAliasRequest;
 import mck.service.urlalias.auth.ApiUser;
+import mck.service.urlalias.metrics.Counters;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
 /**
@@ -24,7 +24,6 @@ import mck.service.urlalias.storage.UrlAliasStorage;
  * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
  */
 @Path("/api")
-@Slf4j
 public class UrlAliasServiceApiResource {
   private final UrlAliasStorage storage;
 
@@ -36,7 +35,7 @@ public class UrlAliasServiceApiResource {
   @POST
   @Path("/set")
   public void set(@Auth ApiUser user, @NotNull @Valid SetUrlAliasRequest request) {
-    LOG.info("set: user={} request={}", user, request);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("POST", "/set", "200", user.getName()).inc();
     storage.set(request.getUrl(), request.getAlias());
   }
 
@@ -45,7 +44,7 @@ public class UrlAliasServiceApiResource {
   @Path("/urls")
   @Produces({"application/json"})
   public Collection<URI> getUrls(@Auth ApiUser user) {
-    LOG.info("getUrls: user={}", user);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/urls", "200", user.getName()).inc();
     return storage.getUrls();
   }
 
@@ -54,7 +53,7 @@ public class UrlAliasServiceApiResource {
   @Path("/url/{url}")
   @Produces({"application/json"})
   public Optional<String> getUrl(@Auth ApiUser user, @PathParam("url") URI url) {
-    LOG.info("getUrl: user={} url={}", user, url);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/url/" + url, "200", user.getName()).inc();
     return storage.get(url);
   }
 
@@ -63,7 +62,7 @@ public class UrlAliasServiceApiResource {
   @Path("/aliases")
   @Produces({"application/json"})
   public Collection<String> getAliases(@Auth ApiUser user) {
-    LOG.info("getAliases: user={}", user);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/aliases", "200", user.getName()).inc();
     return storage.getAliases();
   }
 
@@ -72,7 +71,7 @@ public class UrlAliasServiceApiResource {
   @Path("/alias/{alias}")
   @Produces({"application/json"})
   public Optional<URI> getAlias(@Auth ApiUser user, @PathParam("alias") String alias) {
-    LOG.info("getAlias: user={} alias={}", user, alias);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/alias/" + alias, "200", user.getName()).inc();
     return storage.get(alias);
   }
 
@@ -81,7 +80,7 @@ public class UrlAliasServiceApiResource {
   @Path("/url/{url}")
   @Produces({"application/json"})
   public boolean deleteUrl(@Auth ApiUser user, @PathParam("url") URI url) {
-    LOG.info("deleteUrl: user={} url={}", user, url);
+    Counters.HTTP_REQUESTS_WITH_AUTH.labels("DELETE", "/url/" + url, "200", user.getName()).inc();
     return storage.delete(url);
   }
 
@@ -90,7 +89,9 @@ public class UrlAliasServiceApiResource {
   @Path("/alias/{alias}")
   @Produces({"application/json"})
   public boolean deleteAlias(@Auth ApiUser user, @PathParam("alias") String alias) {
-    LOG.info("deleteAlias: user={} alias={}", user, alias);
+    Counters.HTTP_REQUESTS_WITH_AUTH
+        .labels("DELETE", "/alias/" + alias, "200", user.getName())
+        .inc();
     return storage.delete(alias);
   }
 }

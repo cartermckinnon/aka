@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import mck.service.urlalias.metrics.Counters;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
 /**
@@ -29,8 +30,12 @@ public class UrlAliasServiceRedirectResource {
   public Response redirect(@PathParam("alias") @NotBlank String alias) {
     var url = storage.get(alias);
     if (url.isPresent()) {
+      // include the requested alias, so we can track how aliases are used
+      Counters.HTTP_REQUESTS.labels("GET", "/" + alias, "200").inc();
       return Response.temporaryRedirect(url.get()).build();
     }
+    // don't include the requested alias, to avoid a time series explosion
+    Counters.HTTP_REQUESTS.labels("GET", "/{alias}", "404").inc();
     return Response.status(404)
         .type(UNKNOWN_ALIAS_RESPONSE_TYPE)
         .entity(UNKNOWN_ALIAS_RESPONSE)

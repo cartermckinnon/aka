@@ -6,6 +6,7 @@ import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
 import io.dropwizard.setup.Environment;
+import io.prometheus.client.exporter.MetricsServlet;
 import mck.service.urlalias.auth.AllowAllAuthorizer;
 import mck.service.urlalias.auth.ApiUser;
 import mck.service.urlalias.auth.SimpleAuthenticator;
@@ -40,5 +41,6 @@ public class UrlAliasServiceApplication extends Application<UrlAliasServiceConfi
                     .buildAuthFilter()));
     e.jersey().register(RolesAllowedDynamicFeature.class);
     e.jersey().register(new AuthValueFactoryProvider.Binder<>(ApiUser.class));
+    e.getAdminContext().addServlet(MetricsServlet.class, "/prometheus-metrics");
   }
 }
