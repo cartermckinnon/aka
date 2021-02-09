@@ -26,7 +26,7 @@ import mck.service.urlalias.storage.UrlAliasStorage;
 @Path("/api")
 @Slf4j
 public class UrlAliasServiceApiResource {
-  public UrlAliasStorage storage;
+  private final UrlAliasStorage storage;
 
   public UrlAliasServiceApiResource(UrlAliasStorage storage) {
     this.storage = storage;

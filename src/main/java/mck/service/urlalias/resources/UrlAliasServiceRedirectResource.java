@@ -4,6 +4,7 @@ import javax.validation.constraints.NotBlank;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
@@ -14,7 +15,10 @@ import mck.service.urlalias.storage.UrlAliasStorage;
  */
 @Path("/")
 public class UrlAliasServiceRedirectResource {
-  public UrlAliasStorage storage;
+  protected static final MediaType UNKNOWN_ALIAS_RESPONSE_TYPE = MediaType.TEXT_PLAIN_TYPE;
+  protected static final String UNKNOWN_ALIAS_RESPONSE = "Huh?";
+
+  private final UrlAliasStorage storage;
 
   public UrlAliasServiceRedirectResource(UrlAliasStorage storage) {
     this.storage = storage;
@@ -27,6 +31,9 @@ public class UrlAliasServiceRedirectResource {
     if (url.isPresent()) {
       return Response.temporaryRedirect(url.get()).build();
     }
-    return Response.status(404).type("text/plain").entity("Huh?").build();
+    return Response.status(404)
+        .type(UNKNOWN_ALIAS_RESPONSE_TYPE)
+        .entity(UNKNOWN_ALIAS_RESPONSE)
+        .build();
   }
 }
