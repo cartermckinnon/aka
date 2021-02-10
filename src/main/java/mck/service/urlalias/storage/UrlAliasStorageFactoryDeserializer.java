@@ -36,6 +36,8 @@ public class UrlAliasStorageFactoryDeserializer {
   private String factoryClass = "mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory";
   private Object factory = new MemoryUrlAliasStorageFactory();
 
+  public UrlAliasStorageFactoryDeserializer() {}
+
   public UrlAliasStorageFactoryDeserializer(String factoryClass, Object factory) {
     this.factoryClass = factoryClass;
     this.factory = factory;
