@@ -13,16 +13,12 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import mck.service.urlalias.api.SetUrlAliasRequest;
 import mck.service.urlalias.auth.ApiUser;
 import mck.service.urlalias.metrics.Counters;
+import mck.service.urlalias.resources.api.SetUrlAliasRequest;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
-/**
- * Authenticated, private HTTP API for managing URL aliases.
- *
- * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
- */
+/** Authenticated, private HTTP API for managing URL aliases. */
 @Path("/api")
 public class UrlAliasServiceApiResource {
   private final UrlAliasStorage storage;

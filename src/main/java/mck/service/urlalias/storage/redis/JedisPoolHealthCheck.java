@@ -4,6 +4,7 @@ import com.codahale.metrics.health.HealthCheck;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
+/** Uses the redis {@code PING} command to verify connectivity to the server. */
 public class JedisPoolHealthCheck extends HealthCheck {
 
   private final JedisPool pool;

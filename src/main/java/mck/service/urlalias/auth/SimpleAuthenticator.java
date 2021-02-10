@@ -6,7 +6,7 @@ import io.dropwizard.auth.basic.BasicCredentials;
 import java.util.Map;
 import java.util.Optional;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
+/** Naive authenticator for users of the authenticated HTTP API. */
 public class SimpleAuthenticator implements Authenticator<BasicCredentials, ApiUser> {
   private final Map<String, String> apiCredentials;
 

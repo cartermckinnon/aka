@@ -9,7 +9,6 @@ import lombok.Setter;
 import lombok.ToString;
 import mck.service.urlalias.storage.UrlAliasStorageFactoryDeserializer;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
 @Getter
 @Setter
 @ToString
@@ -18,5 +17,9 @@ public class UrlAliasServiceConfiguration extends Configuration {
   /** Username-to-password map. */
   private Map<String, String> apiCredentials = new HashMap<>();
 
+  /**
+   * Deserializes a {@link UrlAliasStorageFactory}, the type of which is defined at runtime by
+   * {@link UrlAliasStorageFactoryDeserializer#getFactoryClass()}.
+   */
   private UrlAliasStorageFactoryDeserializer storage = new UrlAliasStorageFactoryDeserializer();
 }

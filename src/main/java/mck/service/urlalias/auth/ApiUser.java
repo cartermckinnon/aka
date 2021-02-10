@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
+/** A user of the authenticated HTTP API. */
 @Getter
 @RequiredArgsConstructor
 @ToString

@@ -5,11 +5,7 @@ import java.util.Collection;
 import java.util.Optional;
 import mck.service.urlalias.metrics.Histograms;
 
-/**
- * Implements instrumentation for all methods of {@code UrlAliasStorage}. Child classes should not
- * override these implementations, and should instead implement only the (equivalent) abstract
- * methods defined in this class (i.e. the ones suffixed with {@code -Impl}).
- */
+/** Implements instrumentation for all methods of {@code UrlAliasStorage}. */
 public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
 
   /** @see UrlAliasStorage#get(URI) */

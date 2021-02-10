@@ -2,6 +2,7 @@ package mck.service.urlalias.metrics;
 
 import io.prometheus.client.Counter;
 
+/** Singleton prometheus counters. */
 public enum Counters {
   INSTANCE;
 

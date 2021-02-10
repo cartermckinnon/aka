@@ -21,9 +21,11 @@ import mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory;
  * </pre>
  *
  * This class will convert the generic, deserialized object into an instance of type {@code
- * factoryClass}.
+ * factoryClass}. In this sense, it does not "deserialize" the object, it converts it to a type
+ * defined at runtime.
  *
- * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
+ * <p>By default, {@link MemoryUrlAliasStorageFactory} is returned by {@link
+ * #deserialize(ObjectMapper)}.
  */
 @Getter
 @Setter
@@ -31,8 +33,13 @@ import mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory;
 @EqualsAndHashCode
 public class UrlAliasStorageFactoryDeserializer {
 
-  private Object factory = new MemoryUrlAliasStorageFactory();
   private String factoryClass = "mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory";
+  private Object factory = new MemoryUrlAliasStorageFactory();
+
+  public UrlAliasStorageFactoryDeserializer(String factoryClass, Object factory) {
+    this.factoryClass = factoryClass;
+    this.factory = factory;
+  }
 
   public UrlAliasStorageFactory deserialize(ObjectMapper mapper)
       throws IllegalArgumentException, ClassNotFoundException {

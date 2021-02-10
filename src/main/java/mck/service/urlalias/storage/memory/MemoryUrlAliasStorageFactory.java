@@ -5,10 +5,9 @@ import mck.service.urlalias.storage.UrlAliasStorage;
 import mck.service.urlalias.storage.UrlAliasStorageFactory;
 
 public class MemoryUrlAliasStorageFactory implements UrlAliasStorageFactory {
-
-    @Override
-    public UrlAliasStorage build(Environment e) {
-        return new MemoryUrlAliasStorage();
-    }
-    
+  /** Each call will return a new instance of the in-memory storage implementation. */
+  @Override
+  public UrlAliasStorage build(Environment e) {
+    return new MemoryUrlAliasStorage();
+  }
 }

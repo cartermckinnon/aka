@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/** Parameters for a connection to redis. */
 @Getter
 @Setter
 @ToString

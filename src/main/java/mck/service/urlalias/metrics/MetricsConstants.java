@@ -1,5 +1,6 @@
 package mck.service.urlalias.metrics;
 
+/** Prometheus constant values. */
 public enum MetricsConstants {
   INSTANCE;
 

@@ -15,7 +15,6 @@ import mck.service.urlalias.resources.UrlAliasServiceRedirectResource;
 import mck.service.urlalias.storage.UrlAliasStorage;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
 public class UrlAliasServiceApplication extends Application<UrlAliasServiceConfiguration> {
 
   public static void main(String[] args) throws Exception {
@@ -24,13 +23,17 @@ public class UrlAliasServiceApplication extends Application<UrlAliasServiceConfi
 
   @Override
   public void run(UrlAliasServiceConfiguration c, Environment e) throws Exception {
-    // necessary for the storage factory to be unspecified (for memory impl)
+    // necessary for the storage factory to be unspecified/default in the config
     e.getObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
+    // storage
     UrlAliasStorage storage = c.getStorage().deserialize(e.getObjectMapper()).build(e);
+
+    // http resources
     e.jersey().register(new UrlAliasServiceRedirectResource(storage));
     e.jersey().register(new UrlAliasServiceApiResource(storage));
 
+    // auth
     e.jersey()
         .register(
             new AuthDynamicFeature(
@@ -41,6 +44,8 @@ public class UrlAliasServiceApplication extends Application<UrlAliasServiceConfi
                     .buildAuthFilter()));
     e.jersey().register(RolesAllowedDynamicFeature.class);
     e.jersey().register(new AuthValueFactoryProvider.Binder<>(ApiUser.class));
+
+    // prometheus metrics
     e.getAdminContext().addServlet(MetricsServlet.class, "/prometheus-metrics");
   }
 }

@@ -3,11 +3,18 @@ package mck.service.urlalias.storage.redis;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
+/** Utilities for working with redis keys. */
 public class RedisKeys {
+  /** Glob pattern for scanning alias keys. */
   public static final String ALIAS_PATTERN = "alias:*";
 
+  /** Glob pattern for scanning URL keys. */
   public static final String URL_PATTERN = "url:*";
 
+  /**
+   * @param alias
+   * @return a key of the form {@code alias:{alias}}.
+   */
   public static byte[] alias(byte[] alias) {
     byte[] key = new byte[6 + alias.length];
     key[0] = 'a';
@@ -22,10 +29,19 @@ public class RedisKeys {
     return key;
   }
 
+  /** @see #alias(byte[]) */
   public static byte[] alias(String alias) {
     return alias(alias.getBytes(StandardCharsets.UTF_8));
   }
 
+  /**
+   * @param url
+   * @return a key of the form {@code url:{url_with_reversed_host}}. The host name of the URL is
+   *     "reversed", so that URLs on the same host are adjacent in the keyspace. For example, the
+   *     url {@code http://www.mckinnon.xyz:8080/my/page} would become {@code
+   *     xyz.mckinnon.www:http:8080/my/page}. This reversed URL can be parsed from a key with {@link
+   *     #urlFromKey(String)}.
+   */
   public static byte[] url(URI url) {
     int size = 5; // 'url:' and ':' for scheme delimiter
     String host = url.getHost();
@@ -62,6 +78,11 @@ public class RedisKeys {
     return key;
   }
 
+  /**
+   * @param key
+   * @return un-reversed URL from a URL key. See {@link #url(URI)} for more information on URL
+   *     reversing.
+   */
   public static URI urlFromKey(String key) {
     String reversedUrl = key.substring(4);
     byte[] buf = new byte[reversedUrl.length() + 2];
@@ -117,6 +138,14 @@ public class RedisKeys {
     return writePos;
   }
 
+  /**
+   * Copy the bytes of a string into an existing buffer.
+   *
+   * @param key buffer which must contain enough space to hold the given string.
+   * @param startOffset to start coping/appending.
+   * @param s if null or empty, this method is a no-op.
+   * @return new start offset.
+   */
   protected static int append(byte[] key, int startOffset, String s) {
     if (s == null) {
       return startOffset;

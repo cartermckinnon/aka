@@ -4,7 +4,11 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
+/**
+ * The data structure which contains URLs and their aliases.
+ *
+ * <p>URLs should only be mapped to a single alias, and vice versa.
+ */
 public interface UrlAliasStorage {
   /**
    * @param url

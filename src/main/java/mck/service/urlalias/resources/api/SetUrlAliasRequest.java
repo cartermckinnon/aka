@@ -1,4 +1,4 @@
-package mck.service.urlalias.api;
+package mck.service.urlalias.resources.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
+/** A request to associate a URL with an alias. */
 @Getter
 @Setter
 @ToString

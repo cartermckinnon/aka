@@ -9,11 +9,7 @@ import javax.ws.rs.core.Response;
 import mck.service.urlalias.metrics.Counters;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
-/**
- * Unauthenticated, public HTTP API for redirecting an alias to its target URl.
- *
- * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
- */
+/** Unauthenticated, public HTTP API for redirecting an alias to its target URl. */
 @Path("/")
 public class UrlAliasServiceRedirectResource {
   protected static final MediaType UNKNOWN_ALIAS_RESPONSE_TYPE = MediaType.TEXT_PLAIN_TYPE;

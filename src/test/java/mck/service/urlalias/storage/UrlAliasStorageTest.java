@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
 public abstract class UrlAliasStorageTest {
   /**
    * @return new instance of the implementation to be tested. Each test method will call this once;

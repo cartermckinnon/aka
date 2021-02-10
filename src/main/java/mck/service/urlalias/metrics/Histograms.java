@@ -2,6 +2,7 @@ package mck.service.urlalias.metrics;
 
 import io.prometheus.client.Histogram;
 
+/** Singleton prometheus histograms. */
 public enum Histograms {
   INSTANCE;
 

@@ -9,11 +9,7 @@ import java.util.Optional;
 import mck.service.urlalias.storage.InstrumentedUrlAliasStorage;
 import mck.service.urlalias.storage.UrlAliasStorage;
 
-/**
- * Naive in-memory implementation of {@link UrlAliasStorage}.
- *
- * @author Carter McKinnon {@literal <cartermckinnon@gmail.com>}
- */
+/** Naive in-memory implementation of {@link UrlAliasStorage}. Thread-safe. */
 public class MemoryUrlAliasStorage extends InstrumentedUrlAliasStorage {
 
   private final Map<URI, String> urls;

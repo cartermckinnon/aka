@@ -3,7 +3,7 @@ package mck.service.urlalias.auth;
 import io.dropwizard.auth.Authorizer;
 import javax.ws.rs.container.ContainerRequestContext;
 
-/** @author Carter McKinnon {@literal <cartermckinnon@gmail.com>} */
+/** Allows all users to access all roles/domains. */
 public class AllowAllAuthorizer implements Authorizer<ApiUser> {
 
   @Override
