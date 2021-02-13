@@ -12,13 +12,17 @@ import mck.service.urlalias.storage.UrlAliasStorage;
 /** Unauthenticated, public HTTP API for redirecting an alias to its target URl. */
 @Path("/")
 public class UrlAliasServiceRedirectResource {
-  protected static final MediaType UNKNOWN_ALIAS_RESPONSE_TYPE = MediaType.TEXT_PLAIN_TYPE;
-  protected static final String UNKNOWN_ALIAS_RESPONSE = "Huh?";
+  protected static final MediaType NOT_FOUND_RESPONSE_TYPE = MediaType.TEXT_PLAIN_TYPE;
+  protected static final String NOT_FOUND_RESPONSE_BODY = "Huh?";
 
   private final UrlAliasStorage storage;
 
   public UrlAliasServiceRedirectResource(UrlAliasStorage storage) {
     this.storage = storage;
+  }
+
+  private static Response notFound() {
+    return Response.status(404).type(NOT_FOUND_RESPONSE_TYPE).entity(NOT_FOUND_RESPONSE_BODY).build();
   }
 
   /**
@@ -28,23 +32,23 @@ public class UrlAliasServiceRedirectResource {
    */
   @GET
   public Response emptyPath() {
-    return Response.status(404).type("text/plain").entity("Huh?").build();
+    return notFound();
   }
 
   @GET
   @Path("/{alias}")
   public Response redirect(@PathParam("alias") @NotBlank String alias) {
     var url = storage.get(alias);
+    Response res;
+    String statusLabel;
     if (url.isPresent()) {
-      // include the requested alias, so we can track how aliases are used
-      Counters.HTTP_REQUESTS.labels("GET", "/" + alias, "200").inc();
-      return Response.temporaryRedirect(url.get()).build();
+      statusLabel = "200";
+      res = Response.temporaryRedirect(url.get()).build();
+    } else {
+      statusLabel = "404";
+      res = notFound();
     }
-    // don't include the requested alias, to avoid a time series explosion
-    Counters.HTTP_REQUESTS.labels("GET", "/{alias}", "404").inc();
-    return Response.status(404)
-        .type(UNKNOWN_ALIAS_RESPONSE_TYPE)
-        .entity(UNKNOWN_ALIAS_RESPONSE)
-        .build();
+    Counters.HTTP_REQUESTS.labels("GET", "/{alias}", statusLabel).inc();
+    return res;
   }
 }

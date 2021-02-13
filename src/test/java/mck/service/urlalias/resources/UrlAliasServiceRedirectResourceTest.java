@@ -27,7 +27,7 @@ public class UrlAliasServiceRedirectResourceTest {
     res = resource.redirect("unknownAlias");
     assertThat(res.getStatus()).isEqualTo(404);
     assertThat(res.getMediaType())
-        .isEqualTo(UrlAliasServiceRedirectResource.UNKNOWN_ALIAS_RESPONSE_TYPE);
-    assertThat(res.getEntity()).isEqualTo(UrlAliasServiceRedirectResource.UNKNOWN_ALIAS_RESPONSE);
+        .isEqualTo(UrlAliasServiceRedirectResource.NOT_FOUND_RESPONSE_TYPE);
+    assertThat(res.getEntity()).isEqualTo(UrlAliasServiceRedirectResource.NOT_FOUND_RESPONSE_BODY);
   }
 }
