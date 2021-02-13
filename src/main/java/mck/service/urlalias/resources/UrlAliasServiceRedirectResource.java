@@ -21,6 +21,16 @@ public class UrlAliasServiceRedirectResource {
     this.storage = storage;
   }
 
+  /**
+   * Override the default Dropwizard 404 response for the root path.
+   * 
+   * @return "Huh?"
+   */
+  @GET
+  public Response emptyPath() {
+    return Response.status(404).type("text/plain").entity("Huh?").build();
+  }
+
   @GET
   @Path("/{alias}")
   public Response redirect(@PathParam("alias") @NotBlank String alias) {
