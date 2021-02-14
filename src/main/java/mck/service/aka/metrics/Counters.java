@@ -20,9 +20,9 @@ public enum Counters {
   public static final Counter HTTP_REQUESTS =
       Counter.build()
           .namespace(MetricsConstants.NAMESPACE)
-          .subsystem(MetricsConstants.SUBSYSTEM_HTTP_API)
+          .subsystem(MetricsConstants.SUBSYSTEM_HTTP)
           .name("requests")
-          .help("Total number of requests since boot.")
+          .help("Total number of unauthenticated HTTP requests since boot.")
           .labelNames("method", "path", "status")
           .register();
 
@@ -41,9 +41,9 @@ public enum Counters {
   public static final Counter HTTP_REQUESTS_WITH_AUTH =
       Counter.build()
           .namespace(MetricsConstants.NAMESPACE)
-          .subsystem(MetricsConstants.SUBSYSTEM_HTTP_API_WITH_AUTH)
-          .name("requests")
-          .help("Total number of requests since boot.")
+          .subsystem(MetricsConstants.SUBSYSTEM_HTTP)
+          .name("auth_requests")
+          .help("Total number of authenticated HTTP requests since boot.")
           .labelNames("method", "path", "status", "user")
           .register();
 }
