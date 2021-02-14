@@ -11,4 +11,4 @@ docker run \
   --rm \
   -p 8080:8080 \
   -v $PWD/configuration.yaml:/app/configuration/configuration.yaml \
-  url-alias-service:$VERSION
+  aka:$VERSION

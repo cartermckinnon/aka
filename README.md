@@ -1,4 +1,4 @@
-# URL Alias Service
+# AKA
 
 Naive HTTP service for URL aliasing/redirecting.
 
@@ -37,7 +37,7 @@ With Docker:
 docker run \
   -p 8080:8080 \
   -v $PWD/configuration.yaml:/app/configuration/configuration.yaml \
-  mckdev/url-alias-service
+  mckdev/aka
 ```
 
 ---
@@ -53,13 +53,13 @@ curl \
   -u admin:password \
   http://localhost:8080/api/set
 ```
-See the [management HTTP API implementation](src/main/java/mck/service/urlalias/resources/UrlAliasServiceApiResource.java) for more.
+See the [management HTTP API implementation](src/main/java/mck/service/aka/resources/UrlAliasServiceApiResource.java) for more.
 
 Use an alias:
 ```sh
 curl -L http://localhost:8080/google
 ```
-See the ["redirect" HTTP API implementation](src/main/java/mck/service/urlalias/resources/UrlAliasServiceRedirectResource.java) for more.
+See the ["redirect" HTTP API implementation](src/main/java/mck/service/aka/resources/UrlAliasServiceRedirectResource.java) for more.
 
 ---
 

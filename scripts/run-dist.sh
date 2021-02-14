@@ -4,4 +4,4 @@ set -ex
 
 cd $(dirname $0)
 
-java -jar url-alias-service-*.jar server configuration.yaml
+java -jar aka-*.jar server configuration.yaml

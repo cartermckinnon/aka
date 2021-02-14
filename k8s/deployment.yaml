@@ -2,22 +2,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: url-alias-service
+  name: aka
   labels:
-    app: url-alias-service
+    app: aka
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: url-alias-service
+      app: aka
   template:
     metadata:
       labels:
-        app: url-alias-service
+        app: aka
     spec:
       containers:
-        - name: url-alias-service
-          image: mckdev/url-alias-service
+        - name: aka
+          image: mckdev/aka
           ports:
             - containerPort: 8080
           volumeMounts:
@@ -27,7 +27,7 @@ spec:
       volumes:
         - name: configuration
           configMap:
-            name: url-alias-service
+            name: aka
             items:
               - key: "configuration.yaml"
                 path: "configuration.yaml"

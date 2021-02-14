@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: url-alias-service
+  name: aka
   annotations:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/redirect-entry-point: https
@@ -10,16 +10,16 @@ metadata:
 spec:
   tls:
   - hosts:
-    - url-alias.example.com
-    secretName: url-alias-service-tls
+    - aka.example.com
+    secretName: aka-tls
   rules:
-  - host: url-alias.example.com
+  - host: aka.example.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: url-alias-service
+            name: aka
             port:
               number: 80
