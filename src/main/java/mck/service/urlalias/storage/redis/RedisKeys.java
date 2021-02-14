@@ -5,6 +5,12 @@ import java.nio.charset.StandardCharsets;
 
 /** Utilities for working with redis keys. */
 public class RedisKeys {
+  public static final byte[] ALIAS_HASH_FIELD = "alias".getBytes(StandardCharsets.UTF_8);
+
+  public static final byte[] URL_HASH_FIELD = "url".getBytes(StandardCharsets.UTF_8);
+
+  public static final byte[] USAGES_HASH_FIELD = "usages".getBytes(StandardCharsets.UTF_8);
+
   /** Glob pattern for scanning alias keys. */
   public static final String ALIAS_PATTERN = "alias:*";
 

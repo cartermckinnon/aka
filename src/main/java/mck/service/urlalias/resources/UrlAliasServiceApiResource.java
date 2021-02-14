@@ -17,6 +17,7 @@ import mck.service.urlalias.auth.ApiUser;
 import mck.service.urlalias.metrics.Counters;
 import mck.service.urlalias.resources.api.SetUrlAliasRequest;
 import mck.service.urlalias.storage.UrlAliasStorage;
+import mck.service.urlalias.util.Pair;
 
 /** Authenticated, private HTTP API for managing URL aliases. */
 @Path("/api")
@@ -66,7 +67,7 @@ public class UrlAliasServiceApiResource {
   @GET
   @Path("/alias/{alias}")
   @Produces({"application/json"})
-  public Optional<URI> getAlias(@Auth ApiUser user, @PathParam("alias") String alias) {
+  public Optional<Pair<URI, Long>> getAlias(@Auth ApiUser user, @PathParam("alias") String alias) {
     Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/alias/" + alias, "200", user.getName()).inc();
     return storage.get(alias);
   }

@@ -3,6 +3,7 @@ package mck.service.urlalias.storage;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.URI;
+import mck.service.urlalias.util.Pair;
 import org.junit.jupiter.api.Test;
 
 public abstract class UrlAliasStorageTest {
@@ -21,7 +22,7 @@ public abstract class UrlAliasStorageTest {
     // set for the first time
     storage.set(url, alias);
     assertThat(storage.get(url)).isPresent().get().isEqualTo(alias);
-    assertThat(storage.get(alias)).isPresent().get().isEqualTo(url);
+    assertThat(storage.get(alias)).isPresent().get().extracting(Pair::getLeft).isEqualTo(url);
     assertThat(storage.getUrls()).containsExactly(url);
     assertThat(storage.getAliases()).containsExactly(alias);
 
@@ -29,7 +30,11 @@ public abstract class UrlAliasStorageTest {
     String aliasUpdated = "aliasUpdated";
     storage.set(url, aliasUpdated);
     assertThat(storage.get(url)).isPresent().get().isEqualTo(aliasUpdated);
-    assertThat(storage.get(aliasUpdated)).isPresent().get().isEqualTo(url);
+    assertThat(storage.get(aliasUpdated))
+        .isPresent()
+        .get()
+        .extracting(Pair::getLeft)
+        .isEqualTo(url);
     assertThat(storage.get(alias)).isEmpty();
     assertThat(storage.getUrls()).containsExactly(url);
     assertThat(storage.getAliases()).containsExactly(aliasUpdated);
@@ -58,5 +63,24 @@ public abstract class UrlAliasStorageTest {
     assertThat(storage.delete(url)).isFalse();
     assertThat(storage.get(url)).isEmpty();
     assertThat(storage.get(alias)).isEmpty();
+  }
+
+  @Test
+  public void incrementUsages() {
+    UrlAliasStorage storage = createImpl();
+    URI url = URI.create("http://mckinnon.xyz");
+    String alias = "alias";
+
+    // increment non-existant alias/URL
+    assertThat(storage.incrementUsages(alias)).isEqualTo(-1);
+
+    storage.set(url, alias);
+
+    assertThat(storage.incrementUsages(alias)).isEqualTo(1);
+    assertThat(storage.incrementUsages(alias)).isEqualTo(2);
+
+    storage.delete(alias);
+
+    assertThat(storage.incrementUsages(alias)).isEqualTo(-1);
   }
 }

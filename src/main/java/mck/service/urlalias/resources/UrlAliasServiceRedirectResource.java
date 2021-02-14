@@ -22,12 +22,15 @@ public class UrlAliasServiceRedirectResource {
   }
 
   private static Response notFound() {
-    return Response.status(404).type(NOT_FOUND_RESPONSE_TYPE).entity(NOT_FOUND_RESPONSE_BODY).build();
+    return Response.status(404)
+        .type(NOT_FOUND_RESPONSE_TYPE)
+        .entity(NOT_FOUND_RESPONSE_BODY)
+        .build();
   }
 
   /**
    * Override the default Dropwizard 404 response for the root path.
-   * 
+   *
    * @return "Huh?"
    */
   @GET
@@ -43,7 +46,8 @@ public class UrlAliasServiceRedirectResource {
     String statusLabel;
     if (url.isPresent()) {
       statusLabel = "200";
-      res = Response.temporaryRedirect(url.get()).build();
+      res = Response.temporaryRedirect(url.get().getLeft()).build();
+      storage.incrementUsages(alias);
     } else {
       statusLabel = "404";
       res = notFound();

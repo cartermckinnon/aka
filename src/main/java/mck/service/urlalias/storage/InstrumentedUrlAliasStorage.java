@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
 import mck.service.urlalias.metrics.Histograms;
+import mck.service.urlalias.util.Pair;
 
 /** Implements instrumentation for all methods of {@code UrlAliasStorage}. */
 public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
@@ -12,7 +13,7 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
   protected abstract Optional<String> getImpl(URI url);
 
   /** @see UrlAliasStorage#get(String) */
-  protected abstract Optional<URI> getImpl(String alias);
+  protected abstract Optional<Pair<URI, Long>> getImpl(String alias);
 
   /** @see UrlAliasStorage#set(URI, String) */
   protected abstract void setImpl(URI url, String alias);
@@ -29,6 +30,9 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
   /** @see UrlAliasStorage#delete(URI) */
   protected abstract boolean deleteImpl(URI url);
 
+  /** @see UrlAliasStorage#incrementUsages(String) */
+  protected abstract long incrementUsagesImpl(String alias);
+
   private final String implClass = this.getClass().getName();
 
   @Override
@@ -39,7 +43,7 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public final Optional<URI> get(String alias) {
+  public final Optional<Pair<URI, Long>> get(String alias) {
     return Histograms.STORAGE_OPERATIONS
         .labels(implClass, "getUrlByAlias")
         .time(() -> getImpl(alias));
@@ -74,5 +78,12 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
     return Histograms.STORAGE_OPERATIONS
         .labels(implClass, "deleteByUrl")
         .time(() -> deleteImpl(url));
+  }
+
+  @Override
+  public final long incrementUsages(String alias) {
+    return Histograms.STORAGE_OPERATIONS
+        .labels(implClass, "incrementUsages")
+        .time(() -> incrementUsagesImpl(alias));
   }
 }

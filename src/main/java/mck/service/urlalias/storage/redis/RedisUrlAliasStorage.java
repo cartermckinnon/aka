@@ -4,10 +4,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import mck.service.urlalias.storage.InstrumentedUrlAliasStorage;
+import mck.service.urlalias.util.Pair;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.ScanParams;
@@ -25,18 +28,27 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
   public Optional<String> getImpl(URI url) {
     byte[] alias;
     try (Jedis jedis = pool.getResource()) {
-      alias = jedis.get(RedisKeys.url(url));
+      alias = jedis.hget(RedisKeys.url(url), RedisKeys.ALIAS_HASH_FIELD);
     }
     return Optional.ofNullable(alias).map(bytes -> new String(bytes, UTF_8));
   }
 
   @Override
-  public Optional<URI> getImpl(String alias) {
-    byte[] url;
+  public Optional<Pair<URI, Long>> getImpl(String alias) {
+    Map<byte[], byte[]> hashFields;
     try (Jedis jedis = pool.getResource()) {
-      url = jedis.get(RedisKeys.alias(alias));
+      hashFields = jedis.hgetAll(RedisKeys.alias(alias));
     }
-    return Optional.ofNullable(url).map(bytes -> new String(bytes, UTF_8)).map(URI::create);
+    if (hashFields.isEmpty()) {
+      return Optional.empty();
+    }
+    URI url = URI.create(new String(hashFields.get(RedisKeys.URL_HASH_FIELD), UTF_8));
+    long usages = 0;
+    byte[] usagesField = hashFields.get(RedisKeys.USAGES_HASH_FIELD);
+    if (usagesField != null) {
+      usages = Long.parseLong(new String(usagesField, UTF_8));
+    }
+    return Optional.of(new Pair<>(url, usages));
   }
 
   @Override
@@ -74,26 +86,22 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
   @Override
   public void setImpl(URI url, String alias) {
     byte[] urlKey = RedisKeys.url(url);
+    byte[] urlBytes = url.toString().getBytes(UTF_8);
     byte[] aliasKey = RedisKeys.alias(alias);
-    String status;
+    byte[] aliasBytes = alias.getBytes(UTF_8);
     try (Jedis jedis = pool.getResource()) {
-      byte[] previousAlias = jedis.get(urlKey);
-      status = jedis.set(urlKey, alias.getBytes(UTF_8));
-      if (!"OK".equals(status)) {
-        throw new IllegalStateException(
-            "failed to set URL! status=" + status + " url=" + url + " alias=" + alias);
-      }
-      if (previousAlias != null) {
-        jedis.del(RedisKeys.alias(previousAlias));
-      }
-      byte[] previousUrl = jedis.get(aliasKey);
-      status = jedis.set(aliasKey, url.toString().getBytes(UTF_8));
-      if (!"OK".equals(status)) {
-        throw new IllegalStateException(
-            "failed to set alias! status=" + status + " url=" + url + " to alias=" + alias);
-      }
-      if (previousUrl != null) {
-        jedis.del(RedisKeys.url(URI.create(new String(previousUrl, UTF_8))));
+      byte[] previousAlias = jedis.hget(urlKey, RedisKeys.ALIAS_HASH_FIELD);
+      if (!Arrays.equals(aliasBytes, previousAlias)) {
+        // url was not mapped to an alias, or was mapped to a different alias
+        jedis.hset(urlKey, RedisKeys.ALIAS_HASH_FIELD, aliasBytes);
+        if (previousAlias != null) {
+          jedis.del(RedisKeys.alias(previousAlias));
+        }
+        byte[] previousUrl = jedis.hget(aliasKey, RedisKeys.URL_HASH_FIELD);
+        jedis.hset(aliasKey, RedisKeys.URL_HASH_FIELD, urlBytes);
+        if (previousUrl != null) {
+          jedis.del(RedisKeys.url(URI.create(new String(previousUrl, UTF_8))));
+        }
       }
     }
   }
@@ -102,7 +110,7 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
   public boolean deleteImpl(URI url) {
     byte[] urlKey = RedisKeys.url(url);
     try (Jedis jedis = pool.getResource()) {
-      byte[] alias = jedis.get(urlKey);
+      byte[] alias = jedis.hget(urlKey, RedisKeys.ALIAS_HASH_FIELD);
       if (alias == null) {
         return false;
       }
@@ -116,7 +124,7 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
   public boolean deleteImpl(String alias) {
     byte[] aliasKey = RedisKeys.alias(alias);
     try (Jedis jedis = pool.getResource()) {
-      byte[] url = jedis.get(aliasKey);
+      byte[] url = jedis.hget(aliasKey, RedisKeys.URL_HASH_FIELD);
       if (url == null) {
         return false;
       }
@@ -124,5 +132,19 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
       jedis.del(RedisKeys.url(URI.create(new String(url, UTF_8))));
     }
     return true;
+  }
+
+  @Override
+  protected long incrementUsagesImpl(String alias) {
+    byte[] aliasKey = RedisKeys.alias(alias);
+    try (Jedis jedis = pool.getResource()) {
+      byte[] url = jedis.hget(aliasKey, RedisKeys.URL_HASH_FIELD);
+      if (url != null) {
+        jedis.hincrBy(aliasKey, RedisKeys.USAGES_HASH_FIELD, 1);
+        byte[] urlKey = RedisKeys.url(URI.create(new String(url, UTF_8)));
+        return jedis.hincrBy(urlKey, RedisKeys.USAGES_HASH_FIELD, 1);
+      }
+    }
+    return -1;
   }
 }

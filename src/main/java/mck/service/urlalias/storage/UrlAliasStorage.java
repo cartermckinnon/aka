@@ -3,6 +3,7 @@ package mck.service.urlalias.storage;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Optional;
+import mck.service.urlalias.util.Pair;
 
 /**
  * The data structure which contains URLs and their aliases.
@@ -18,9 +19,9 @@ public interface UrlAliasStorage {
 
   /**
    * @param alias
-   * @return the URL for an alias, if it exists.
+   * @return the URL for an alias and the number of usages of the alias; if it exists.
    */
-  public Optional<URI> get(String alias);
+  public Optional<Pair<URI, Long>> get(String alias);
 
   /** @return all URLs. */
   public Collection<URI> getUrls();
@@ -45,4 +46,12 @@ public interface UrlAliasStorage {
    * @return true if the URL was deleted; false if it did not exist.
    */
   public boolean delete(URI url);
+
+  /**
+   * Increment the usage counter for an alias.
+   *
+   * @param alias
+   * @return number of times this alias has been used, including this occurrance.
+   */
+  public long incrementUsages(String alias);
 }
