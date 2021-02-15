@@ -37,52 +37,54 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
 
   @Override
   public final Optional<String> get(URI url) {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "getAliasByUrl")
         .time(() -> getImpl(url));
   }
 
   @Override
   public final Optional<Pair<URI, Long>> get(String alias) {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "getUrlByAlias")
         .time(() -> getImpl(alias));
   }
 
   @Override
   public final Collection<URI> getUrls() {
-    return Histograms.STORAGE_OPERATIONS.labels(implClass, "getUrls").time(() -> getUrlsImpl());
+    return Histograms.STORAGE_OPERATION_DURATION
+        .labels(implClass, "getUrls")
+        .time(() -> getUrlsImpl());
   }
 
   @Override
   public final Collection<Pair<String, Long>> getAliases() {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "getAliases")
         .time(() -> getAliasesImpl());
   }
 
   @Override
   public final void set(URI url, String alias) {
-    Histograms.STORAGE_OPERATIONS.labels(implClass, "set").time(() -> setImpl(url, alias));
+    Histograms.STORAGE_OPERATION_DURATION.labels(implClass, "set").time(() -> setImpl(url, alias));
   }
 
   @Override
   public final boolean delete(String alias) {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "deleteByAlias")
         .time(() -> deleteImpl(alias));
   }
 
   @Override
   public final boolean delete(URI url) {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "deleteByUrl")
         .time(() -> deleteImpl(url));
   }
 
   @Override
   public final long incrementUsages(String alias) {
-    return Histograms.STORAGE_OPERATIONS
+    return Histograms.STORAGE_OPERATION_DURATION
         .labels(implClass, "incrementUsages")
         .time(() -> incrementUsagesImpl(alias));
   }

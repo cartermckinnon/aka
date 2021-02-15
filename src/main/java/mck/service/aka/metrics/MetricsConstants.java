@@ -8,7 +8,5 @@ public enum MetricsConstants {
 
   protected static final String SUBSYSTEM_STORAGE = "storage";
 
-  protected static final String SUBSYSTEM_HTTP_API = "http_api";
-
-  protected static final String SUBSYSTEM_HTTP_API_WITH_AUTH = "http_api_with_auth";
+  protected static final String SUBSYSTEM_HTTP = "http";
 }

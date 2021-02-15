@@ -1,0 +1,5 @@
+---
+factoryClass: "mck.service.aka.storage.TestUrlAliasStorageFactory"
+factory:
+  foo: foo
+  bar: bar
