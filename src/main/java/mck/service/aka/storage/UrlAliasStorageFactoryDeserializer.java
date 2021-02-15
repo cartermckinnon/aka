@@ -33,7 +33,7 @@ import mck.service.aka.storage.memory.MemoryUrlAliasStorageFactory;
 @EqualsAndHashCode
 public class UrlAliasStorageFactoryDeserializer {
 
-  private String factoryClass = "mck.service.urlalias.storage.memory.MemoryUrlAliasStorageFactory";
+  private String factoryClass = MemoryUrlAliasStorageFactory.class.getName();
   private Object factory = new MemoryUrlAliasStorageFactory();
 
   public UrlAliasStorageFactoryDeserializer() {}

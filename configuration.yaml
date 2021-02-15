@@ -10,7 +10,7 @@ apiCredentials:
   admin: password
 # uncomment and modify as necessary to enable redis storage
 #storage:
-#  factoryClass: mck.service.urlalias.storage.redis.RedisUrlAliasStorageFactory
+#  factoryClass: mck.service.aka.storage.redis.RedisUrlAliasStorageFactory
 #  factory:
 #    redis:
 #      host: localhost

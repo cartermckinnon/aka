@@ -1,5 +1,7 @@
 package mck.service.aka.storage.memory;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
+
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
@@ -39,8 +41,10 @@ public class MemoryUrlAliasStorage extends InstrumentedUrlAliasStorage {
   }
 
   @Override
-  public synchronized Collection<String> getAliasesImpl() {
-    return Collections.unmodifiableCollection(aliases.keySet());
+  public synchronized Collection<Pair<String, Long>> getAliasesImpl() {
+    return aliases.entrySet().stream()
+        .map(entry -> new Pair<>(entry.getKey(), entry.getValue().getRight().value()))
+        .collect(toUnmodifiableList());
   }
 
   @Override

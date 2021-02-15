@@ -26,8 +26,8 @@ public interface UrlAliasStorage {
   /** @return all URLs. */
   public Collection<URI> getUrls();
 
-  /** @return all aliases. */
-  public Collection<String> getAliases();
+  /** @return all aliases and their number of usages. */
+  public Collection<Pair<String, Long>> getAliases();
 
   /**
    * @param url

@@ -24,7 +24,7 @@ public abstract class UrlAliasStorageTest {
     assertThat(storage.get(url)).isPresent().get().isEqualTo(alias);
     assertThat(storage.get(alias)).isPresent().get().extracting(Pair::getLeft).isEqualTo(url);
     assertThat(storage.getUrls()).containsExactly(url);
-    assertThat(storage.getAliases()).containsExactly(alias);
+    assertThat(storage.getAliases()).extracting(Pair::getLeft).containsExactly(alias);
 
     // update the alias, which should remove the old one
     String aliasUpdated = "aliasUpdated";
@@ -37,7 +37,7 @@ public abstract class UrlAliasStorageTest {
         .isEqualTo(url);
     assertThat(storage.get(alias)).isEmpty();
     assertThat(storage.getUrls()).containsExactly(url);
-    assertThat(storage.getAliases()).containsExactly(aliasUpdated);
+    assertThat(storage.getAliases()).extracting(Pair::getLeft).containsExactly(aliasUpdated);
   }
 
   @Test

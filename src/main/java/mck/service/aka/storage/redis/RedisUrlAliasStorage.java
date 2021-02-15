@@ -1,11 +1,13 @@
 package mck.service.aka.storage.redis;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toUnmodifiableList;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +19,8 @@ import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 
 public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
+
+  private final byte[] ZERO = "0".getBytes(UTF_8);
 
   private final JedisPool pool;
 
@@ -44,7 +48,7 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
     }
     URI url = URI.create(new String(hashFields.get(RedisKeys.URL_HASH_FIELD), UTF_8));
     long usages = 0;
-    byte[] usagesField = hashFields.get(RedisKeys.USAGES_HASH_FIELD);
+    byte[] usagesField = hashFields.get(RedisKeys.USAGES_HASH_FIELD_BYTES);
     if (usagesField != null) {
       usages = Long.parseLong(new String(usagesField, UTF_8));
     }
@@ -68,19 +72,36 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
   }
 
   @Override
-  public Collection<String> getAliasesImpl() {
-    List<String> aliases = new ArrayList<>();
+  public Collection<Pair<String, Long>> getAliasesImpl() {
+    // redis SCAN may return a key more than once, so we need
+    // to be able to track the keys we've already seen
+    Map<String, Long> keys = new HashMap<>();
     ScanParams params = new ScanParams();
     params.match(RedisKeys.ALIAS_PATTERN);
     String cursor = ScanParams.SCAN_POINTER_START;
     try (Jedis jedis = pool.getResource()) {
       do {
         ScanResult<String> res = jedis.scan(cursor, params);
+        for (String key : res.getResult()) {
+          if (!keys.containsKey(key)) {
+            String usages = jedis.hget(key, RedisKeys.USAGES_HASH_FIELD);
+            if (usages != null) {
+              keys.put(key, Long.parseLong(usages));
+            } else {
+              System.out.println("\n\nkey didn't have a usage during scan: " + key + "\n\n");
+              keys.remove(key); // key was deleted while we were scanning
+            }
+          }
+        }
         cursor = res.getCursor();
-        res.getResult().stream().map(alias -> alias.substring(6)).forEach(aliases::add);
       } while (!cursor.equals(ScanParams.SCAN_POINTER_START));
     }
-    return aliases;
+    return keys.entrySet().stream()
+        .map(
+            entry ->
+                new Pair<>(
+                    entry.getKey().substring(RedisKeys.ALIAS_PREFIX.length()), entry.getValue()))
+        .collect(toUnmodifiableList());
   }
 
   @Override
@@ -91,17 +112,33 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
     byte[] aliasBytes = alias.getBytes(UTF_8);
     try (Jedis jedis = pool.getResource()) {
       byte[] previousAlias = jedis.hget(urlKey, RedisKeys.ALIAS_HASH_FIELD);
+      // we only have work to do if the URL isn't currently mapped to this alias
       if (!Arrays.equals(aliasBytes, previousAlias)) {
-        // url was not mapped to an alias, or was mapped to a different alias
-        jedis.hset(urlKey, RedisKeys.ALIAS_HASH_FIELD, aliasBytes);
+        // if the URL was already mapped to a different alias, delete that alias
         if (previousAlias != null) {
           jedis.del(RedisKeys.alias(previousAlias));
         }
+
+        // if the alias was already mapped to a different URL, delete that URL
         byte[] previousUrl = jedis.hget(aliasKey, RedisKeys.URL_HASH_FIELD);
-        jedis.hset(aliasKey, RedisKeys.URL_HASH_FIELD, urlBytes);
         if (previousUrl != null) {
           jedis.del(RedisKeys.url(URI.create(new String(previousUrl, UTF_8))));
         }
+
+        // map URL to alias
+        jedis.hset(urlKey, RedisKeys.ALIAS_HASH_FIELD, aliasBytes);
+
+        // HINCRBY will initialize the 'usages' field with zero on the first increment,
+        // but we need to initialize it up front so that #getAliasesImpl() can return zero
+        // for unused aliases. Otherwise, an HGET for the 'usages' field will return null,
+        // and this overlaps with the behavior of SCAN, which may return a key that is deleted
+        // while we are scanning. We have to be able to distinguish the two scenarios.
+        Map<byte[], byte[]> hashFields = new HashMap<>();
+        hashFields.put(RedisKeys.URL_HASH_FIELD, urlBytes);
+        hashFields.put(RedisKeys.USAGES_HASH_FIELD_BYTES, ZERO);
+
+        // map alias to URL
+        jedis.hset(aliasKey, hashFields);
       }
     }
   }
@@ -140,9 +177,9 @@ public class RedisUrlAliasStorage extends InstrumentedUrlAliasStorage {
     try (Jedis jedis = pool.getResource()) {
       byte[] url = jedis.hget(aliasKey, RedisKeys.URL_HASH_FIELD);
       if (url != null) {
-        jedis.hincrBy(aliasKey, RedisKeys.USAGES_HASH_FIELD, 1);
+        jedis.hincrBy(aliasKey, RedisKeys.USAGES_HASH_FIELD_BYTES, 1);
         byte[] urlKey = RedisKeys.url(URI.create(new String(url, UTF_8)));
-        return jedis.hincrBy(urlKey, RedisKeys.USAGES_HASH_FIELD, 1);
+        return jedis.hincrBy(urlKey, RedisKeys.USAGES_HASH_FIELD_BYTES, 1);
       }
     }
     return -1;

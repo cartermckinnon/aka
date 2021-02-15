@@ -22,7 +22,7 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
   protected abstract Collection<URI> getUrlsImpl();
 
   /** @see UrlAliasStorage#getAliases() */
-  protected abstract Collection<String> getAliasesImpl();
+  protected abstract Collection<Pair<String, Long>> getAliasesImpl();
 
   /** @see UrlAliasStorage#delete(String) */
   protected abstract boolean deleteImpl(String alias);
@@ -55,7 +55,7 @@ public abstract class InstrumentedUrlAliasStorage implements UrlAliasStorage {
   }
 
   @Override
-  public final Collection<String> getAliases() {
+  public final Collection<Pair<String, Long>> getAliases() {
     return Histograms.STORAGE_OPERATIONS
         .labels(implClass, "getAliases")
         .time(() -> getAliasesImpl());

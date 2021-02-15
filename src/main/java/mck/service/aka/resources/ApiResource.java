@@ -58,7 +58,7 @@ public class ApiResource {
   @GET
   @Path("/aliases")
   @Produces({"application/json"})
-  public Collection<String> getAliases(@Auth ApiUser user) {
+  public Collection<Pair<String, Long>> getAliases(@Auth ApiUser user) {
     Counters.HTTP_REQUESTS_WITH_AUTH.labels("GET", "/aliases", "200", user.getName()).inc();
     return storage.getAliases();
   }
