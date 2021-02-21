@@ -5,6 +5,7 @@ import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.basic.BasicCredentialAuthFilter;
+import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.prometheus.client.exporter.MetricsServlet;
 import mck.service.aka.auth.AllowAllAuthorizer;
@@ -22,10 +23,19 @@ public class AkaApplication extends Application<AkaConfiguration> {
   }
 
   @Override
-  public void run(AkaConfiguration c, Environment e) throws Exception {
-    // necessary for the storage factory to be unspecified/default in the config
-    e.getObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+  public String getName() {
+    return "aka";
+  }
 
+  @Override
+  public void initialize(Bootstrap<AkaConfiguration> bootstrap) {
+    // necessary for config defaults to work properly
+    // i.e. no config file specified, or no storage block specified
+    bootstrap.getObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+  }
+
+  @Override
+  public void run(AkaConfiguration c, Environment e) throws Exception {
     // storage
     UrlAliasStorage storage = c.getStorage().deserialize(e.getObjectMapper()).build(e);
 
